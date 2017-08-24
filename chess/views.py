@@ -23,13 +23,14 @@ def index(request):
     game_name = request.session.get('game_name')
     if not game_name:
         game_name = str(random.randint(1000, 9999))
-        request.session['game_name'] = game_name
-        request.session.save()
 
     return HttpResponseRedirect('/game/%s/' % game_name)
 
 
 def game(request, name):
+
+    request.session['game_name'] = name
+    request.session.save()
 
     user = request.user
 
