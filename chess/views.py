@@ -53,6 +53,21 @@ def game(request, name):
     return render_to_response('game.html', locals())
 
 
+def game_status(request, name):
+
+    game = Game.objects.get(name=name)
+
+    result = {
+        'game': {
+            'board': game.board,
+            'winner': game.winner,
+            'turn': game.turn,
+        }
+    }
+
+    return JsonResponse(result)
+
+
 def try_to_draw(request):
 
     game_id = request.POST.get('game_id')
@@ -117,7 +132,6 @@ def try_to_draw(request):
             'winner': game.winner,
             'turn': game.turn,
         }
-
 
     return JsonResponse(result)
 

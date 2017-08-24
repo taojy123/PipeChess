@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^index/$', index),
 
     url(r'^game/(.+?)/$', game),
+    url(r'^game/(.+?)/status$', game_status),
 
     url(r'^try_to_draw/$', try_to_draw),
     

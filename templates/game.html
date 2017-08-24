@@ -232,26 +232,13 @@
     });
 
     setInterval(function () {
-
-        function try_to_draw(game_id, from_id, to_id) {
-            $.ajax({
-                type: 'post',
-                url: '/try_to_draw/',
-                data: {
-                    game_id: game_id,
-                    from_id: from_id,
-                    to_id: to_id
-                },
-                success: function (result) {
-                    console.log(result);
-                    if(result['success']){
-                        update_status(result['game']);
-                    } else {
-                        alert(result['detail']);
-                    }
-                }
-            })
-        }
+        $.ajax({
+            type: 'get',
+            url: '/game/{{ game.name }}/status/',
+            success: function (result) {
+                update_status(result['game']);
+            }
+        })
     }, 3000);
 
     update_status(game);
