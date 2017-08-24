@@ -22,6 +22,7 @@
 <body>
 
 <div style="display: none;">
+    <span class="player"></span>
     <span class="glyphicon-pencil"></span>
     <span class="glyphicon-thumbs-up"></span>
 </div>
@@ -125,12 +126,12 @@
     <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
             <li class="list-group-item list-group-item-warning">
-                <span id="player1">{{ game.player1.username }}</span>
+                <span id="player1" class="player">{{ game.player1.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
             <li class="list-group-item list-group-item-info">
-                <span id="player2">{{ game.player2.username }}</span>
+                <span id="player2" class="player">{{ game.player2.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
@@ -153,7 +154,6 @@
 <script type="text/javascript">
 
     var i, j;
-    var PLAYERS = ['-', '{{ game.player1.username }}', '{{ game.player2.username }}'];
 
     function update_status(game) {
         var x, y, tid;
@@ -168,7 +168,7 @@
 
         if(winner){
             $('.glyphicon-thumbs-up:eq(' + winner + ')').show();
-            var winplayer = PLAYERS[winner];
+            var winplayer = $('.player:eq(' + winner + ')').show();
             if(winplayer === '{{ user.username }}'){
                 bootbox.alert('恭喜你 获得胜利！')
             } else {
@@ -288,7 +288,7 @@
                 update_status(game);
             }
         })
-    }, 3000);
+    }, 2000);
 
 </script>
 
