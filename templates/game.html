@@ -168,7 +168,7 @@
 
         if(winner){
             $('.glyphicon-thumbs-up:eq(' + winner + ')').show();
-            var winplayer = $('.player:eq(' + winner + ')').show();
+            var winplayer = $('.player:eq(' + winner + ')').html();
             if(winplayer === '{{ user.username }}'){
                 bootbox.alert('恭喜你 获得胜利！')
             } else {
