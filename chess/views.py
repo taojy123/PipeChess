@@ -121,7 +121,6 @@ def try_to_draw(request):
         result['detail'] = u'此两点间无法连线，只能连接相邻一格距离的两点'
 
     if result['success'] and game.board[pipe_i][pipe_j] != ' ':
-        print game.board[pipe_i][pipe_j]
         result['success'] = False
         result['detail'] = u'此两点间已有连线'
 

@@ -21,6 +21,13 @@
 
 <body>
 
+<div style="display: none;">
+    <span class="glyphicon-pencil"></span>
+    <span class="glyphicon-king"></span>
+    <span class="player"></span>
+    <span class="player">{{ game.player1.username }}</span>
+    <span class="player">{{ game.player2.username }}</span>
+</div>
 
 <div class="row" style="width:100%">
 
@@ -118,7 +125,7 @@
 
     </div>
 
-    <div class="col-sm-4 col-xs-9" style="padding-top: 5px; padding-left: 6%; padding-right: 3%; ">
+    <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
             <li class="list-group-item list-group-item-warning">
                 {{ game.player1.username }}
@@ -152,8 +159,18 @@
         var x, y, tid;
         var board = game['board'];
         var turn = game['turn'];
+        var winner = game['winner'];
+
         $('.glyphicon-pencil').hide();
-        $('.glyphicon-pencil:eq(' + (turn-1) + ')').show();
+        $('.glyphicon-pencil:eq(' + turn + ')').show();
+
+        if(winner){
+            $('.glyphicon-king').hide();
+            $('.glyphicon-king:eq(' + winner + ')').show();
+            var winplayer = $('.player:eq(' + winner + ')').html();
+            alert('恭喜' + winplayer + '胜利')
+        }
+
         for (i = 0; i < board.length; i++) {
             for (j = 0; j < board[i].length; j++) {
                 var item = board[i][j];
@@ -195,6 +212,7 @@
                 to_id: to_id
             },
             success: function (result) {
+                console.log(result);
                 if(result['success']){
                     update_status(result['game']);
                 } else {
@@ -220,15 +238,6 @@
         }
     });
 
-    setInterval(function () {
-        $.ajax({
-            type: 'get',
-            url: '/game/{{ game.name }}/status/',
-            success: function (result) {
-                update_status(result['game']);
-            }
-        })
-    }, 3000);
 
     var board = [
         {% for line in game.board %}
@@ -249,6 +258,21 @@
     };
 
     update_status(game);
+
+    setInterval(function () {
+        if(game.winner){
+            return
+        }
+        $.ajax({
+            type: 'get',
+            url: '/game/{{ game.name }}/status/',
+            success: function (result) {
+                console.log(result);
+                game = result['game']
+                update_status(game);
+            }
+        })
+    }, 3000);
 
 </script>
 
