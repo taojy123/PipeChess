@@ -23,7 +23,7 @@
 
 <div style="display: none;">
     <span class="glyphicon-pencil"></span>
-    <span class="glyphicon-king"></span>
+    <span class="glyphicon-thumbs-up"></span>
 </div>
 
 <div class="row" style="width:100%">
@@ -127,12 +127,12 @@
             <li class="list-group-item list-group-item-warning">
                 {{ game.player1.username }}
                 <span class="glyphicon glyphicon-pencil"></span>
-                <span class="glyphicon glyphicon-king"></span>
+                <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
             <li class="list-group-item list-group-item-info">
                 {{ game.player2.username }}
                 <span class="glyphicon glyphicon-pencil"></span>
-                <span class="glyphicon glyphicon-king"></span>
+                <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
         </ul>
     </div>
@@ -162,17 +162,17 @@
         var winner = game['winner'];
 
         $('.glyphicon-pencil').hide();
-        $('.glyphicon-pencil:eq(' + turn + ')').show();
-
         if(winner){
-            $('.glyphicon-king').hide();
-            $('.glyphicon-king:eq(' + winner + ')').show();
+            $('.glyphicon-thumbs-up').hide();
+            $('.glyphicon-thumbs-up:eq(' + winner + ')').show();
             var winplayer = PLAYERS[winner];
             if(winplayer === '{{ user.username }}'){
                 alert('恭喜你 获得胜利！')
             } else {
-                alert(winplayer + '获胜')
+                alert(winplayer + ' 获胜')
             }
+        } else {
+            $('.glyphicon-pencil:eq(' + turn + ')').show();
         }
 
         for (i = 0; i < board.length; i++) {
