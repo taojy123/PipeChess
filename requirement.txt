@@ -1,0 +1,4 @@
+django
+xlwt
+BeautifulSoup
+django-jsonfield

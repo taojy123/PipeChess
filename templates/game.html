@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>水管棋</title>
+
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
+
+
+    <script src="/static/js/jquery-1.10.2.js"></script>
+    <script src="/static/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <script src="/static/js/jquery.ui.touch-punch.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+
+
+</head>
+
+<body>
+
+
+<div class="row" style="padding: 20px">
+
+    <div id="board" style="padding: 30px; width: 300px; height: 500px; position: relative; float: left; margin-left: 8%">
+
+        <div style="position: relative; width: 100%; height: 100%">
+
+            {% for x in '012'|make_list %}
+                {% for y in '01234'|make_list %}
+                    <div id="f{{ x }}{{ y }}" class="flag"
+                         style="
+                                 left: {% widthratio x 3 100 %}%;
+                                 top: {% widthratio y 5 100 %}%;
+                                 width: 33%;
+                                 height: 20%;
+                                 position: absolute;
+                                 cursor: pointer;
+                         "
+                    ></div>
+                {% endfor %}
+            {% endfor %}
+
+            {% for x in '012'|make_list %}
+                {% for y in '012345'|make_list %}
+                    <div id="h{{ x }}{{ y }}" class="hpipe"
+                         style="
+                                 left: {% widthratio x 3 100 %}%;
+                                 top: {% widthratio y 5 100 %}%;
+                                 margin-top: -10px;
+                                 width: 33%;
+                                 height: 20px;
+                                 background: lightgray;
+                                 position: absolute;
+                                 cursor: pointer;
+                                 display: none;
+                         "
+                    ></div>
+                {% endfor %}
+            {% endfor %}
+
+            {% for x in '0123'|make_list %}
+                {% for y in '01234'|make_list %}
+                    <div id="v{{ x }}{{ y }}" class="vpipe"
+                         style="
+                                 left: {% widthratio x 3 100 %}%;
+                                 top: {% widthratio y 5 100 %}%;
+                                 margin-left: -10px;
+                                 width: 20px;
+                                 height: 20%;
+                                 background: lightgray;
+                                 position: absolute;
+                                 cursor: pointer;
+                                 display: none;
+                         "
+                    ></div>
+                {% endfor %}
+            {% endfor %}
+
+            {% for x in '0123'|make_list %}
+                {% for y in '012345'|make_list %}
+                    <div class="static-dot"
+                         style="
+                                 left: {% widthratio x 3 100 %}%;
+                                 top: {% widthratio y 5 100 %}%;
+                                 margin-left: -10px;
+                                 margin-top: -10px;
+                                 width: 20px;
+                                 height: 20px;
+                                 border-radius: 50%;
+                                 background: gray;
+                                 position: absolute;
+                         "
+                    ></div>
+                    <div id="d{{ x }}{{ y }}" class="dot"
+                         data-left="{% widthratio x 3 100 %}%"
+                         data-top="{% widthratio y 5 100 %}%"
+                         style="
+                                 left: {% widthratio x 3 100 %}%;
+                                 top: {% widthratio y 5 100 %}%;
+                                 margin-left: -25px;
+                                 margin-top: -25px;
+                                 width: 50px;
+                                 height: 50px;
+                                 border-radius: 50%;
+                                 background: lightgray;
+                                 opacity: 0.1;
+                                 position: absolute;
+                                 cursor: pointer;
+                         "
+                    ></div>
+                {% endfor %}
+            {% endfor %}
+
+
+        </div>
+
+    </div>
+
+    <div class="col-sm-6 col-xs-12" style="padding-top: 20px">
+        <ul class="list-group">
+            <li class="list-group-item list-group-item-warning">{{ game.player1.username }}</li>
+            <li class="list-group-item list-group-item-info">{{ game.player2.username }}</li>
+        </ul>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+    var i, j;
+
+    var board = [
+        {% for line in game.board %}
+            {% if forloop.counter0 %},{% endif %}
+            [
+                {% for item in line %}
+                    {% if forloop.counter0 %},{% endif %}
+                    '{{ item }}'
+                {% endfor %}
+            ]
+        {% endfor %}
+    ];
+
+    var game = {
+        board: board,
+        turn: {{ game.turn }},
+        winner: {{ game.winner }}
+    };
+
+    function update_status(game) {
+        var x, y, tid;
+        var board = game['board'];
+        for (i = 0; i < board.length; i++) {
+            for (j = 0; j < board[i].length; j++) {
+                var item = board[i][j];
+                if (item === '—') {
+                    x = (j - 1) / 2;
+                    y = i / 2;
+                    tid = 'h' + x + y;
+                    $('#' + tid).show();
+                }
+                if (item === '|') {
+                    x = j / 2;
+                    y = (i - 1) / 2;
+                    tid = 'v' + x + y;
+                    $('#' + tid).show();
+                }
+                if (item === '1') {
+                    x = (j - 1) / 2;
+                    y = (i - 1) / 2;
+                    tid = 'f' + x + y;
+                    $('#' + tid).css('background', '#faf2cc');
+                }
+                if (item === '2') {
+                    x = (j - 1) / 2;
+                    y = (i - 1) / 2;
+                    tid = 'f' + x + y;
+                    $('#' + tid).css('background', '#c4e3f3');
+                }
+            }
+        }
+    }
+
+    function try_to_draw(game_id, from_id, to_id) {
+        $.ajax({
+            type: 'post',
+            url: '/try_to_draw/',
+            data: {
+                game_id: game_id,
+                from_id: from_id,
+                to_id: to_id
+            },
+            success: function (result) {
+                console.log(result);
+                if(result['success']){
+                    update_status(result['game']);
+                } else {
+                    alert(result['detail']);
+                }
+            },
+            error: function () {
+                alert('遇到错误');
+            }
+        })
+    }
+
+    $('.dot').draggable({
+        stop: function (event, ui) {
+            var dot = $(event.target);
+            dot.css('left', dot.attr('data-left'));
+            dot.css('top', dot.attr('data-top'));
+        }
+    });
+
+    $('.dot').droppable({
+        drop: function (event, ui) {
+            var game_id = {{ game.id }};
+            var from_id = ui.draggable[0].id;
+            var to_id = event.target.id;
+            try_to_draw(game_id, from_id, to_id);
+        }
+    });
+
+    update_status(game);
+
+</script>
+
+
+
+</body>
+</html>
