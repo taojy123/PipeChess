@@ -46,7 +46,7 @@ def game(request, name):
     if not game.player1:
         game.player1 = user
         game.save()
-    elif not game.player2:
+    elif not game.player2 and game.player1 != user:
         game.player2 = user
         game.save()
 

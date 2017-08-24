@@ -22,9 +22,10 @@
 <body>
 
 
-<div class="row" style="padding: 20px">
+<div class="row" style="width:100%">
 
-    <div id="board" style="padding: 30px; width: 300px; height: 500px; position: relative; float: left; margin-left: 8%">
+    {# 3 * 5 #}
+    <div id="board" style="padding: 30px; width: 300px; height: 500px; position: relative; float: left; margin-left: 10%">
 
         <div style="position: relative; width: 100%; height: 100%">
 
@@ -119,8 +120,8 @@
 
     </div>
 
-    <div class="col-sm-6 col-xs-12" style="padding-top: 20px">
-        <ul class="list-group">
+    <div class="col-sm-6 col-xs-12" style="padding-top: 5px; padding-left: 10%; padding-right: 10%; ">
+        <ul class="list-group" style="margin-bottom: 0">
             <li class="list-group-item list-group-item-warning">{{ game.player1.username }}</li>
             <li class="list-group-item list-group-item-info">{{ game.player2.username }}</li>
         </ul>
@@ -225,6 +226,29 @@
             try_to_draw(game_id, from_id, to_id);
         }
     });
+
+    setInterval(function () {
+
+        function try_to_draw(game_id, from_id, to_id) {
+            $.ajax({
+                type: 'post',
+                url: '/try_to_draw/',
+                data: {
+                    game_id: game_id,
+                    from_id: from_id,
+                    to_id: to_id
+                },
+                success: function (result) {
+                    console.log(result);
+                    if(result['success']){
+                        update_status(result['game']);
+                    } else {
+                        alert(result['detail']);
+                    }
+                }
+            })
+        }
+    }, 3000);
 
     update_status(game);
 
