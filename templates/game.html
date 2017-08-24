@@ -125,12 +125,12 @@
     <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
             <li class="list-group-item list-group-item-warning">
-                {{ game.player1.username }}
+                <span id="player1">{{ game.player1.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
             <li class="list-group-item list-group-item-info">
-                {{ game.player2.username }}
+                <span id="player2">{{ game.player2.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
@@ -160,6 +160,8 @@
         var board = game['board'];
         var turn = game['turn'];
         var winner = game['winner'];
+        var player1 = game['player1'];
+        var player2 = game['player2'];
 
         $('.glyphicon-pencil').hide();
         $('.glyphicon-thumbs-up').hide();
@@ -174,6 +176,14 @@
             }
         } else {
             $('.glyphicon-pencil:eq(' + turn + ')').show();
+        }
+
+        if(player1){
+            $('#player1').html(player1);
+        }
+
+        if(player2){
+            $('#player2').html(player2);
         }
 
         for (i = 0; i < board.length; i++) {
@@ -219,6 +229,7 @@
             success: function (result) {
                 console.log(result);
                 if(result['success']){
+                    game = result['game']
                     update_status(result['game']);
                 } else {
                     bootbox.alert(result['detail']);
