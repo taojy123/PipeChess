@@ -56,6 +56,7 @@ class Game(models.Model):
             self.board[i][j] = '|'
         if not self.check_flag():
             self.switch_turn()
+        self.save()
 
     def check_flag(self):
         flag = False
