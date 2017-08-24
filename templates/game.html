@@ -162,8 +162,9 @@
         var winner = game['winner'];
 
         $('.glyphicon-pencil').hide();
+        $('.glyphicon-thumbs-up').hide();
+
         if(winner){
-            $('.glyphicon-thumbs-up').hide();
             $('.glyphicon-thumbs-up:eq(' + winner + ')').show();
             var winplayer = PLAYERS[winner];
             if(winplayer === '{{ user.username }}'){
