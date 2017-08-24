@@ -26,8 +26,8 @@ urlpatterns = [
     url(r'^$', index),
     url(r'^index/$', index),
 
-    url(r'^game/(.+?)/$', game),
-    url(r'^game/(.+?)/status$', game_status),
+    url(r'^game/([\d\w]+)/$', game),
+    url(r'^game/([\d\w]+)/status/$', game_status),
 
     url(r'^try_to_draw/$', try_to_draw),
     

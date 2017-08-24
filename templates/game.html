@@ -96,8 +96,6 @@
                          "
                     ></div>
                     <div id="d{{ x }}{{ y }}" class="dot"
-                         data-left="{% widthratio x 3 100 %}%"
-                         data-top="{% widthratio y 5 100 %}%"
                          style="
                                  left: {% widthratio x 3 100 %}%;
                                  top: {% widthratio y 5 100 %}%;
@@ -120,15 +118,26 @@
 
     </div>
 
-    <div class="col-sm-4 col-xs-9" style="padding-top: 5px; padding-left: 5%; padding-right: 5%; ">
+    <div class="col-sm-4 col-xs-9" style="padding-top: 5px; padding-left: 6%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
-            <li class="list-group-item list-group-item-warning">{{ game.player1.username }}</li>
-            <li class="list-group-item list-group-item-info">{{ game.player2.username }}</li>
+            <li class="list-group-item list-group-item-warning">
+                {{ game.player1.username }}
+                <span class="glyphicon glyphicon-pencil"></span>
+            </li>
+            <li class="list-group-item list-group-item-info">
+                {{ game.player2.username }}
+                <span class="glyphicon glyphicon-pencil"></span>
+            </li>
         </ul>
     </div>
 
-    <div class="col-sm-2 col-xs-3" style="padding-top: 5px; padding-left: 5%; padding-right: 5%; ">
-        <a href="#" class="btn btn-primary">settings</a>
+    <div class="col-sm-2 col-xs-3" style="padding-top: 5px; padding-left: 5%; padding-right: 0; ">
+        <div class="row" style="padding-top: 12px; padding-bottom: 12px">
+            <a href="#" ><span class="glyphicon glyphicon-user" style="font-size: 16px">{{ user.username }}</span></a>
+        </div>
+        <div class="row" style="padding-top: 12px; padding-bottom: 12px">
+            <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 16px">水管棋</span></a>
+        </div>
     </div>
 
 </div>
@@ -139,27 +148,12 @@
 
     var i, j;
 
-    var board = [
-        {% for line in game.board %}
-            {% if forloop.counter0 %},{% endif %}
-            [
-                {% for item in line %}
-                    {% if forloop.counter0 %},{% endif %}
-                    '{{ item }}'
-                {% endfor %}
-            ]
-        {% endfor %}
-    ];
-
-    var game = {
-        board: board,
-        turn: {{ game.turn }},
-        winner: {{ game.winner }}
-    };
-
     function update_status(game) {
         var x, y, tid;
         var board = game['board'];
+        var turn = game['turn'];
+        $('.glyphicon-pencil').hide();
+        $('.glyphicon-pencil:eq(' + (turn-1) + ')').show();
         for (i = 0; i < board.length; i++) {
             for (j = 0; j < board[i].length; j++) {
                 var item = board[i][j];
@@ -201,7 +195,6 @@
                 to_id: to_id
             },
             success: function (result) {
-                console.log(result);
                 if(result['success']){
                     update_status(result['game']);
                 } else {
@@ -215,11 +208,7 @@
     }
 
     $('.dot').draggable({
-        stop: function (event, ui) {
-            var dot = $(event.target);
-            dot.css('left', dot.attr('data-left'));
-            dot.css('top', dot.attr('data-top'));
-        }
+        revert: true
     });
 
     $('.dot').droppable({
@@ -240,6 +229,24 @@
             }
         })
     }, 3000);
+
+    var board = [
+        {% for line in game.board %}
+            {% if forloop.counter0 %},{% endif %}
+            [
+                {% for item in line %}
+                    {% if forloop.counter0 %},{% endif %}
+                    '{{ item }}'
+                {% endfor %}
+            ]
+        {% endfor %}
+    ];
+
+    var game = {
+        board: board,
+        turn: {{ game.turn }},
+        winner: {{ game.winner }}
+    };
 
     update_status(game);
 
