@@ -24,9 +24,6 @@
 <div style="display: none;">
     <span class="glyphicon-pencil"></span>
     <span class="glyphicon-king"></span>
-    <span class="player"></span>
-    <span class="player">{{ game.player1.username }}</span>
-    <span class="player">{{ game.player2.username }}</span>
 </div>
 
 <div class="row" style="width:100%">
@@ -154,6 +151,7 @@
 <script type="text/javascript">
 
     var i, j;
+    var PLAYERS = ['{{ game.player1.username }}', '{{ game.player2.username }}'];
 
     function update_status(game) {
         var x, y, tid;
@@ -167,8 +165,12 @@
         if(winner){
             $('.glyphicon-king').hide();
             $('.glyphicon-king:eq(' + winner + ')').show();
-            var winplayer = $('.player:eq(' + winner + ')').html();
-            alert('恭喜' + winplayer + '胜利')
+            var winplayer = PLAYERS[winner];
+            if(winner === '{{ user.username }}'){
+                alert('恭喜你 获得胜利！')
+            } else {
+                alert(winplayer + '获胜')
+            }
         }
 
         for (i = 0; i < board.length; i++) {

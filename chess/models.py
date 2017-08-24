@@ -54,10 +54,11 @@ class Game(models.Model):
             self.board[i][j] = '—'
         else:
             self.board[i][j] = '|'
-        self.check_flag()
-        self.switch_turn()
+        if not self.check_flag():
+            self.switch_turn()
 
     def check_flag(self):
+        flag = False
         board = self.board
         for i in range(11):
             for j in range(7):
@@ -67,6 +68,9 @@ class Game(models.Model):
                 if not self.is_surrounded(i, j):
                     continue
                 self.board[i][j] = str(self.turn)
+                flag = True
+        self.check_winner()
+        return flag
 
     def is_surrounded(self, i, j):
         board = self.board

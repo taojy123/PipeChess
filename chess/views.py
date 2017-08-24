@@ -80,6 +80,11 @@ def try_to_draw(request):
 
     game = Game.objects.get(id=game_id)
 
+    if game.winner:
+        return JsonResponse({'success': False, 'detail': u'游戏已结束'})
+
+    game.check_winner()
+
     user = request.user
 
     if not user:
