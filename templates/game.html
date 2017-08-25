@@ -32,7 +32,7 @@
     {# 3 * 5 #}
     <div id="board" style="width: 300px; height: 500px; padding: 30px; position: relative; float: left; margin-left: 10%">
 
-        <div style="position: relative; width: 100%; height: 100%">
+        <div id="panel" style="position: relative; width: 100%; height: 100%">
 
             {% for x in '012'|make_list %}
                 {% for y in '01234'|make_list %}
@@ -87,7 +87,7 @@
 
             {% for x in '0123'|make_list %}
                 {% for y in '012345'|make_list %}
-                    <div class="static-dot"
+                    <div id="sd{{ x }}{{ y }}" class="static-dot"
                          style="
                                  left: {% widthratio x 3 100 %}%;
                                  top: {% widthratio y 5 100 %}%;
@@ -126,11 +126,17 @@
     <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
             <li class="list-group-item list-group-item-warning">
+                {% if user == game.player1 %}
+                    <span class="glyphicon glyphicon-user"></span>
+                {% endif %}
                 <span id="player1" class="player">{{ game.player1.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
             <li class="list-group-item list-group-item-info">
+                {% if user == game.player2 %}
+                    <span class="glyphicon glyphicon-user"></span>
+                {% endif %}
                 <span id="player2" class="player">{{ game.player2.username }}</span>
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
@@ -138,12 +144,12 @@
         </ul>
     </div>
 
-    <div class="col-sm-1 col-xs-3" style="padding-top: 5px; padding-left: 5%; padding-right: 0; white-space: nowrap">
-        <div class="row" style="padding-top: 12px; padding-bottom: 12px">
-            <a href="#" ><span class="glyphicon glyphicon-user" style="font-size: 16px">{{ user.username }}</span></a>
+    <div class="col-sm-1 col-xs-3" style="padding-top: 5px; padding-left: 10px; padding-right: 0; white-space: nowrap">
+        <div class="row" style="padding-top: 9px; padding-bottom: 9px">
+            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px"></span></a>
         </div>
-        <div class="row" style="padding-top: 12px; padding-bottom: 12px;">
-            <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 16px">水管棋</span></a>
+        <div class="row" style="padding-top: 9px; padding-bottom: 9px;">
+            <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 20px; font-weight: bold">水管棋</span></a>
         </div>
     </div>
 
@@ -242,8 +248,73 @@
     }
 
     $('.dot').draggable({
-        revert: true
+{#        snap: '.dot',#}
+        revert: true,
+        drag: function (event, ui) {
+
+            var left = ui['position']['left'];
+            var top = ui['position']['top'];
+            var originalLeft = ui['originalPosition']['left'];
+            var originalTop = ui['originalPosition']['top'];
+            var deltaLeft = left - originalLeft;
+            var deltaTop = top - originalTop;
+
+            var color = 'gray';
+            {% if user == game.player1 %}
+                color = '#faf2cc';
+            {% elif user == game.player2 %}
+                color = '#c4e3f3';
+            {% endif %}
+
+{#            var point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');#}
+{#            $('#panel').append(point);#}
+
+            $('.point').remove();
+
+            if(Math.abs(deltaLeft) > Math.abs(deltaTop)){
+                if(deltaLeft > 0){
+                    for(i=1;i<deltaLeft;i++){
+                         j =  i * deltaTop / deltaLeft;
+                        left = originalLeft + i - 4;
+                        top = originalTop + j - 4;
+                        point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
+                        $('#panel').append(point);
+                    }
+                } else {
+                    for(i=-1;i>deltaLeft;i--){
+                         j =  i * deltaTop / deltaLeft;
+                        left = originalLeft + i - 4;
+                        top = originalTop + j - 4;
+                        point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
+                        $('#panel').append(point);
+                    }
+                }
+            } else {
+                if(deltaTop > 0){
+                    for(i=1;i<deltaTop;i++){
+                         j =  i * deltaLeft / deltaTop;
+                        top = originalTop + i - 4;
+                        left = originalLeft + j - 4;
+                        point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
+                        $('#panel').append(point);
+                    }
+                } else {
+                    for(i=-1;i>deltaTop;i--){
+                         j =  i * deltaLeft / deltaTop;
+                        top = originalTop + i - 4;
+                        left = originalLeft + j - 4;
+                        point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
+                        $('#panel').append(point);
+                    }
+                }
+            }
+
+        },
+        stop: function (event, ui) {
+            $('.point').remove()
+        }
     });
+
 
     $('.dot').droppable({
         drop: function (event, ui) {
@@ -270,7 +341,9 @@
     var game = {
         board: board,
         turn: {{ game.turn }},
-        winner: {{ game.winner }}
+        winner: {{ game.winner }},
+        player1: '{{ game.player1.username }}',
+        player2: '{{ game.player2.username }}'
     };
 
     update_status(game);
@@ -284,7 +357,7 @@
             url: '/game/{{ game.name }}/status/',
             success: function (result) {
                 console.log(result);
-                game = result['game']
+                game = result['game'];
                 update_status(game);
             }
         })
