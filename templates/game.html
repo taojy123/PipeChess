@@ -275,16 +275,16 @@
                 if(deltaLeft > 0){
                     for(i=1;i<deltaLeft;i++){
                          j =  i * deltaTop / deltaLeft;
-                        left = originalLeft + i - 4;
-                        top = originalTop + j - 4;
+                        left = originalLeft + i - 5;
+                        top = originalTop + j - 5;
                         point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
                         $('#panel').append(point);
                     }
                 } else {
                     for(i=-1;i>deltaLeft;i--){
                          j =  i * deltaTop / deltaLeft;
-                        left = originalLeft + i - 4;
-                        top = originalTop + j - 4;
+                        left = originalLeft + i - 5;
+                        top = originalTop + j - 5;
                         point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
                         $('#panel').append(point);
                     }
@@ -293,16 +293,16 @@
                 if(deltaTop > 0){
                     for(i=1;i<deltaTop;i++){
                          j =  i * deltaLeft / deltaTop;
-                        top = originalTop + i - 4;
-                        left = originalLeft + j - 4;
+                        top = originalTop + i - 5;
+                        left = originalLeft + j - 5;
                         point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
                         $('#panel').append(point);
                     }
                 } else {
                     for(i=-1;i>deltaTop;i--){
                          j =  i * deltaLeft / deltaTop;
-                        top = originalTop + i - 4;
-                        left = originalLeft + j - 4;
+                        top = originalTop + i - 5;
+                        left = originalLeft + j - 5;
                         point = $('<div class="point" style="left: ' + left + 'px; top: ' + top + 'px; width: 10px; height: 10px; border-radius: 50%; background: ' + color + '; position: absolute;"></div>');
                         $('#panel').append(point);
                     }
