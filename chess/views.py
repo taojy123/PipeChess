@@ -72,8 +72,8 @@ def game_status(request, name):
             'board': game.board,
             'winner': game.winner,
             'turn': game.turn,
-            'player1': game.player1.username,
-            'player2': game.player2.username,
+            'player1': game.player1.username if game.player1 else '',
+            'player2': game.player2.username if game.player2 else '',
         }
     }
 
