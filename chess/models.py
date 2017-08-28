@@ -137,19 +137,19 @@ class Game(models.Model):
                 if board[i][j] != '0':
                     continue
                 count = 0
-                if board[i + 1][j]:
+                if not board[i + 1][j]:
                     count += 1
                     ii, jj = i+1, j
-                if board[i - 1][j]:
+                if not board[i - 1][j]:
                     count += 1
                     ii, jj = i-1, j
-                if board[i][j + 1]:
+                if not board[i][j + 1]:
                     count += 1
                     ii, jj = i, j+1
-                if board[i][j - 1]:
+                if not board[i][j - 1]:
                     count += 1
                     ii, jj = i, j-1
-                if count == 3:
+                if count == 1:
                     return ii, jj
         return 0, 0
 
@@ -157,7 +157,7 @@ class Game(models.Model):
         game = self.get_shadow()
         board = game.board
         while True:
-            i, j = self.get_gain_pipe()
+            i, j = game.get_gain_pipe()
             if i and j:
                 board[i][j] = '+'
             else:
@@ -169,7 +169,7 @@ class Game(models.Model):
                 if board[i][j] != '0':
                     continue
                 assert (0 < i < 10) and (0 < j < 6), (i, j)
-                if self.is_surrounded(i, j):
+                if game.is_surrounded(i, j):
                     count += 1
 
         return count
