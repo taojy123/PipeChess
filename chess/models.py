@@ -20,20 +20,20 @@ FULL_BOARD_DATA = [
     ['|', '1', '|', '1', '|', '1', '|'],
     ['·', '—', '·', '—', '·', '—', '·'],
 ]
-# '—' is not '-'
+# '—' is different from '-'
 
 INIT_BOARD_DATA = [
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
-    [' ', '0', ' ', '0', ' ', '0', ' '],
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
-    [' ', '0', ' ', '0', ' ', '0', ' '],
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
-    [' ', '0', ' ', '0', ' ', '0', ' '],
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
-    [' ', '0', ' ', '0', ' ', '0', ' '],
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
-    [' ', '0', ' ', '0', ' ', '0', ' '],
-    ['·', ' ', '·', ' ', '·', ' ', '·'],
+    ['·', '', '·', '', '·', '', '·'],
+    ['', '0', '', '0', '', '0', ''],
+    ['·', '', '·', '', '·', '', '·'],
+    ['', '0', '', '0', '', '0', ''],
+    ['·', '', '·', '', '·', '', '·'],
+    ['', '0', '', '0', '', '0', ''],
+    ['·', '', '·', '', '·', '', '·'],
+    ['', '0', '', '0', '', '0', ''],
+    ['·', '', '·', '', '·', '', '·'],
+    ['', '0', '', '0', '', '0', ''],
+    ['·', '', '·', '', '·', '', '·'],
 ]
 
 
@@ -52,9 +52,9 @@ class Game(models.Model):
         return self.name
 
     def draw_pipe(self, i, j, player=None):
-        if self.board[i][j] != ' ':
-            return False
         if player and self.current_player != player:
+            return False
+        if self.board[i][j]:
             return False
         if i % 2 == 0:
             self.board[i][j] = '—'
@@ -84,13 +84,13 @@ class Game(models.Model):
     def is_surrounded(self, i, j, n=4):
         board = self.board
         count = 0
-        if board[i+1][j] != ' ':
+        if board[i+1][j]:
             count += 1
-        if board[i-1][j] != ' ':
+        if board[i-1][j]:
             count += 1
-        if board[i][j+1] != ' ':
+        if board[i][j+1]:
             count += 1
-        if board[i][j-1] != ' ':
+        if board[i][j-1]:
             count += 1
         return count == n
 
@@ -116,46 +116,110 @@ class Game(models.Model):
         return self.winner
 
     def ai_try_to_draw(self):
+        if self.winner:
+            return
         ai, created = User.objects.get_or_create(username='AI')
         if self.current_player != ai:
             return
         i, j = self.get_best_draw()
-        print i, j
         self.draw_pipe(i, j, ai)
 
-    def get_best_draw(self):
-        game = Game(board=copy.deepcopy(self.board))
-        gain_pipes = []
-        lost_pipes = []
-        normal_pipes = []
+    def get_shadow(self):
+        board = [line[:] for line in self.board[:]]
+        game = Game(board=board)
+        return game
+
+    def get_gain_pipe(self):
+        board = self.board
+        ii, jj = 0, 0
         for i in range(11):
             for j in range(7):
-                print i, j
-                if game.board[i][j] != ' ':
+                if board[i][j] != '0':
+                    continue
+                count = 0
+                if board[i + 1][j]:
+                    count += 1
+                    ii, jj = i+1, j
+                if board[i - 1][j]:
+                    count += 1
+                    ii, jj = i-1, j
+                if board[i][j + 1]:
+                    count += 1
+                    ii, jj = i, j+1
+                if board[i][j - 1]:
+                    count += 1
+                    ii, jj = i, j-1
+                if count == 3:
+                    return ii, jj
+        return 0, 0
+
+    def max_gains(self):
+        game = self.get_shadow()
+        board = game.board
+        while True:
+            i, j = self.get_gain_pipe()
+            if i and j:
+                board[i][j] = '+'
+            else:
+                break
+
+        count = 0
+        for i in range(11):
+            for j in range(7):
+                if board[i][j] != '0':
+                    continue
+                assert (0 < i < 10) and (0 < j < 6), (i, j)
+                if self.is_surrounded(i, j):
+                    count += 1
+
+        return count
+
+    def max_losts(self, i, j):
+        game = self.get_shadow()
+        game.board[i][j] = '+'
+        return game.max_gains()
+
+    def get_best_draw(self):
+        game = self.get_shadow()
+        gain_pipes = []
+        normal_pipes = []
+        lost_pipes = []
+        for i in range(11):
+            for j in range(7):
+                if game.board[i][j]:
                     continue
                 game.board[i][j] = '+'
-                if game.check_surrounded(n=4):
+                if game.check_surrounded():
                     gain_pipes.append((i, j))
                 elif game.check_surrounded(n=3):
                     lost_pipes.append((i, j))
                 else:
                     normal_pipes.append((i, j))
-                game.board[i][j] = ' '
+                game.board[i][j] = ''
 
         print gain_pipes
         print normal_pipes
         print lost_pipes
 
         if gain_pipes:
-            print 11
+            print 'ai draw gain'
             return random.choice(gain_pipes)
 
         if normal_pipes:
-            print 22
+            print 'ai draw normal'
             return random.choice(normal_pipes)
 
-        print 33
-        return random.choice(lost_pipes)
+        print 'ai draw lost'
+        rs = {}
+        for i, j in lost_pipes:
+            max_losts = self.max_losts(i, j)
+            rs[max_losts] = rs.get(max_losts, [])
+            rs[max_losts].append((i, j))
+
+        max_losts = sorted(rs)[0]
+
+        return random.choice(rs[max_losts])
+
 
     def check_surrounded(self, n=4):
         board = self.board
@@ -168,15 +232,6 @@ class Game(models.Model):
                     continue
                 return True
         return False
-
-
-    def copy_tmp_game(self):
-        Game.objects.filter(name=self.name + '_tmp').delete()
-        game = copy.deepcopy(self)
-        game.id = None
-        game.name += '_tmp'
-        game.save()
-        return game
 
     @property
     def items(self):
@@ -198,6 +253,7 @@ class Game(models.Model):
     def board_display(self):
         display = ''
         for line in self.board:
+            line = [item if item else ' ' for item in line]
             display += ' '.join(line) + '\n'
         return display
 
