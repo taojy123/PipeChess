@@ -53,6 +53,15 @@ def game(request, name):
 
     game, created = Game.objects.get_or_create(name=name)
 
+    if game.is_ai:
+        ai, created = User.objects.get_or_create(username='AI')
+        if game.player1 != ai and game.player2 != ai:
+            if game.name.startswith('ai1'):
+                game.player1 = ai
+            else:
+                game.player2 = ai
+            game.save()
+
     if not game.player1:
         game.player1 = user
         game.save()
@@ -67,14 +76,11 @@ def game_status(request, name):
 
     game = Game.objects.get(name=name)
 
+    if game.is_ai:
+        game.ai_try_to_draw()
+
     result = {
-        'game': {
-            'board': game.board,
-            'winner': game.winner,
-            'turn': game.turn,
-            'player1': game.player1.username if game.player1 else '',
-            'player2': game.player2.username if game.player2 else '',
-        }
+        'game': game.status
     }
 
     return JsonResponse(result)
@@ -145,12 +151,8 @@ def try_to_draw(request):
         result['detail'] = u'此两点间已有连线'
 
     if result['success']:
-        game.draw_pipe(pipe_i, pipe_j)
-        result['game'] = {
-            'board': game.board,
-            'winner': game.winner,
-            'turn': game.turn,
-        }
+        game.draw_pipe(pipe_i, pipe_j, user)
+        result['game'] = game.status
 
     return JsonResponse(result)
 

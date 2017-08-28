@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import random
+import copy
+
 from django.db import models
 from django.contrib.auth.models import User
 from jsonfield import JSONField
 
-
-# '—' is not '-' !
 
 FULL_BOARD_DATA = [
     ['·', '—', '·', '—', '·', '—', '·'],
@@ -19,6 +20,7 @@ FULL_BOARD_DATA = [
     ['|', '1', '|', '1', '|', '1', '|'],
     ['·', '—', '·', '—', '·', '—', '·'],
 ]
+# '—' is not '-'
 
 INIT_BOARD_DATA = [
     ['·', ' ', '·', ' ', '·', ' ', '·'],
@@ -43,20 +45,26 @@ class Game(models.Model):
     player2 = models.ForeignKey(User, related_name='as_player2_games', null=True, blank=True)
     winner = models.IntegerField(default=0)     # 0,1,2
     turn = models.IntegerField(default=1)       # 1,2
+    last_pipe = JSONField(default=list)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return self.name
 
-    def draw_pipe(self, i, j):
-        assert self.board[i][j] == ' '
+    def draw_pipe(self, i, j, player=None):
+        if self.board[i][j] != ' ':
+            return False
+        if player and self.current_player != player:
+            return False
         if i % 2 == 0:
             self.board[i][j] = '—'
         else:
             self.board[i][j] = '|'
         if not self.check_flag():
             self.switch_turn()
+        self.last_pipe = [i, j]
         self.save()
+        return True
 
     def check_flag(self):
         flag = False
@@ -73,17 +81,18 @@ class Game(models.Model):
         self.check_winner()
         return flag
 
-    def is_surrounded(self, i, j):
+    def is_surrounded(self, i, j, n=4):
         board = self.board
-        if board[i+1][j] == ' ':
-            return False
-        if board[i-1][j] == ' ':
-            return False
-        if board[i][j+1] == ' ':
-            return False
-        if board[i][j-1] == ' ':
-            return False
-        return True
+        count = 0
+        if board[i+1][j] != ' ':
+            count += 1
+        if board[i-1][j] != ' ':
+            count += 1
+        if board[i][j+1] != ' ':
+            count += 1
+        if board[i][j-1] != ' ':
+            count += 1
+        return count == n
 
     def switch_turn(self):
         if self.turn == 1:
@@ -99,12 +108,75 @@ class Game(models.Model):
         if '0' in items:
             assert self.winner == 0
             return 0
-        if items['1'] > items['2']:
+        if items.get('1', 0) > items.get('2', 0):
             self.winner = 1
         else:
             self.winner = 2
         self.save()
         return self.winner
+
+    def ai_try_to_draw(self):
+        ai, created = User.objects.get_or_create(username='AI')
+        if self.current_player != ai:
+            return
+        i, j = self.get_best_draw()
+        print i, j
+        self.draw_pipe(i, j, ai)
+
+    def get_best_draw(self):
+        game = Game(board=copy.deepcopy(self.board))
+        gain_pipes = []
+        lost_pipes = []
+        normal_pipes = []
+        for i in range(11):
+            for j in range(7):
+                print i, j
+                if game.board[i][j] != ' ':
+                    continue
+                game.board[i][j] = '+'
+                if game.check_surrounded(n=4):
+                    gain_pipes.append((i, j))
+                elif game.check_surrounded(n=3):
+                    lost_pipes.append((i, j))
+                else:
+                    normal_pipes.append((i, j))
+                game.board[i][j] = ' '
+
+        print gain_pipes
+        print normal_pipes
+        print lost_pipes
+
+        if gain_pipes:
+            print 11
+            return random.choice(gain_pipes)
+
+        if normal_pipes:
+            print 22
+            return random.choice(normal_pipes)
+
+        print 33
+        return random.choice(lost_pipes)
+
+    def check_surrounded(self, n=4):
+        board = self.board
+        for i in range(11):
+            for j in range(7):
+                if board[i][j] != '0':
+                    continue
+                assert (0 < i < 10) and (0 < j < 6), (i, j)
+                if not self.is_surrounded(i, j, n):
+                    continue
+                return True
+        return False
+
+
+    def copy_tmp_game(self):
+        Game.objects.filter(name=self.name + '_tmp').delete()
+        game = copy.deepcopy(self)
+        game.id = None
+        game.name += '_tmp'
+        game.save()
+        return game
 
     @property
     def items(self):
@@ -134,6 +206,25 @@ class Game(models.Model):
         display = self.board_display.strip().replace('\n', '<br>').replace(' ', '&nbsp;')
         display = '<code>%s<code>' % display
         return display
+
+    @property
+    def is_ai(self):
+        return self.name.startswith('ai')
+
+    @property
+    def current_player(self):
+        return getattr(self, 'player%d' % self.turn)
+
+    @property
+    def status(self):
+        return {
+            'board': self.board,
+            'winner': self.winner,
+            'turn': self.turn,
+            'player1': self.player1.username if self.player1 else '',
+            'player2': self.player2.username if self.player2 else '',
+            'last_pipe': self.last_pipe,
+        }
 
 
 

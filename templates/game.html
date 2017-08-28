@@ -168,6 +168,8 @@
         var winner = game['winner'];
         var player1 = game['player1'];
         var player2 = game['player2'];
+        var last_pipe = game['last_pipe'];
+        var init = game['init'];
 
         $('.glyphicon-pencil').hide();
         $('.glyphicon-thumbs-up').hide();
@@ -175,10 +177,12 @@
         if(winner){
             $('.glyphicon-thumbs-up:eq(' + winner + ')').show();
             var winplayer = $('.player:eq(' + winner + ')').html();
-            if(winplayer === '{{ user.username }}'){
-                bootbox.alert('恭喜你 获得胜利！')
-            } else {
-                bootbox.alert(winplayer + ' 获胜')
+            if(!init){
+                if(winplayer === '{{ user.username }}'){
+                    bootbox.alert('恭喜你 获得胜利！')
+                } else {
+                    bootbox.alert(winplayer + ' 获胜')
+                }
             }
         } else {
             $('.glyphicon-pencil:eq(' + turn + ')').show();
@@ -200,12 +204,17 @@
                     y = i / 2;
                     tid = 'h' + x + y;
                     $('#' + tid).show();
+                    $('#' + tid).css('background', 'lightgray');
                 }
                 if (item === '|') {
                     x = j / 2;
                     y = (i - 1) / 2;
                     tid = 'v' + x + y;
                     $('#' + tid).show();
+                    $('#' + tid).css('background', 'lightgray');
+                }
+                if (last_pipe[0]===i && last_pipe[1]===j){
+                    $('#' + tid).css('background', '#aaaaaa');
                 }
                 if (item === '1') {
                     x = (j - 1) / 2;
@@ -343,7 +352,9 @@
         turn: {{ game.turn }},
         winner: {{ game.winner }},
         player1: '{{ game.player1.username }}',
-        player2: '{{ game.player2.username }}'
+        player2: '{{ game.player2.username }}',
+        last_pipe: [],
+        init: true
     };
 
     update_status(game);
