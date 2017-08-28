@@ -155,18 +155,17 @@ class Game(models.Model):
 
     def max_gains(self):
         game = self.get_shadow()
-        board = game.board
         while True:
             i, j = game.get_gain_pipe()
-            if i and j:
-                board[i][j] = '+'
+            if i or j:
+                game.board[i][j] = '+'
             else:
                 break
 
         count = 0
         for i in range(11):
             for j in range(7):
-                if board[i][j] != '0':
+                if game.board[i][j] != '0':
                     continue
                 assert (0 < i < 10) and (0 < j < 6), (i, j)
                 if game.is_surrounded(i, j):
