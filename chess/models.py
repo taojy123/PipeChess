@@ -123,13 +123,13 @@ class Game(models.Model):
             return
 
         t1 = time.time()
-
         i, j = self.get_best_draw()
-        self.draw_pipe(i, j, ai)
-
         t2 = time.time()
         print 'ai_try_to_draw, cost:', t2 - t1
 
+        self.draw_pipe(i, j, ai)
+
+    # 获取当前棋局的影子棋局 即单纯复制 board
     def get_shadow(self):
         board = [line[:] for line in self.board[:]]
         game = Game(board=board)
@@ -184,7 +184,8 @@ class Game(models.Model):
         game.board[i][j] = '+'
         return game.max_gains()
 
-    def get_best_draw(self):
+    # 获取当前棋局上 直接吃的 / 不吃不送的 / 要送子的 下棋位置
+    def get_gain_normal_lost_pipes(self):
         game = self.get_shadow()
         gain_pipes = []
         normal_pipes = []
@@ -194,39 +195,74 @@ class Game(models.Model):
                 if game.board[i][j]:
                     continue
                 game.board[i][j] = '+'
-                if game.check_surrounded():
+                if game.get_surrounded_count():
                     gain_pipes.append((i, j))
-                elif game.check_surrounded(n=3):
+                elif game.get_surrounded_count(n=3):
                     lost_pipes.append((i, j))
                 else:
                     normal_pipes.append((i, j))
                 game.board[i][j] = ''
 
-        print gain_pipes
-        print normal_pipes
-        print lost_pipes
+        return gain_pipes, normal_pipes, lost_pipes
+
+    def get_best_draw(self):
+
+        gain_pipes, normal_pipes, lost_pipes = self.get_gain_normal_lost_pipes()
+
+        print 'gain_pipes:', gain_pipes
+        print 'normal_pipes:', normal_pipes
+        print 'lost_pipes:', lost_pipes
+
+        if not gain_pipes and not normal_pipes and not lost_pipes:
+            return 0, 0
 
         if gain_pipes:
-            print 'ai draw gain'
+            print '=========== ai draw gain =============='
+            game = self.get_shadow()
+            game.try_to_gain_all()
+            gs, ns, ls = game.get_gain_normal_lost_pipes()
+            if not gs and not ns:
+                lost_stat = self.get_lost_stat(lost_pipes)
+                if sorted(lost_pipes)[0] >= 3:
+                    pass
+                    # todo
+
+
             return random.choice(gain_pipes)
 
         if normal_pipes:
-            print 'ai draw normal'
+            print '=========== ai draw normal ============'
             return random.choice(normal_pipes)
 
-        print 'ai draw lost'
-        rs = {}
-        for i, j in lost_pipes:
+        print '========= ai draw lost ============='
+        lost_stat = self.get_lost_stat(lost_pipes)
+
+        max_losts = sorted(lost_stat)[0]
+        print 'max_losts:', max_losts
+
+        # 当必须送2个的时候 在2个格子中间划线（避免主动权交由对方）
+        if max_losts == 2:
+            for i, j in lost_stat[2]:
+                game = self.get_shadow()
+                game.board[i][j] = '+'
+                if game.get_surrounded_count(n=3) == 2:
+                    return i, j
+
+        return random.choice(lost_stat[max_losts])
+
+    # 获取下这些步时对应要送出多少个子 返回 dict
+    def get_lost_stat(self, pipes):
+        lost_stat = {}
+        for i, j in pipes:
             max_losts = self.max_losts(i, j)
-            rs[max_losts] = rs.get(max_losts, [])
-            rs[max_losts].append((i, j))
-
-        max_losts = sorted(rs)[0]
-
-        return random.choice(rs[max_losts])
+            lost_stat[max_losts] = lost_stat.get(max_losts, [])
+            lost_stat[max_losts].append((i, j))
+        return lost_stat
 
 
-    def check_surrounded(self, n=4):
+    # 获取当前棋盘上被包围 n 面的旗子的数量
+    def get_surrounded_count(self, n=3):
+        count = 0
         board = self.board
         for i in range(11):
             for j in range(7):
@@ -235,7 +271,26 @@ class Game(models.Model):
                 assert (0 < i < 10) and (0 < j < 6), (i, j)
                 if not self.is_surrounded(i, j, n):
                     continue
-                return True
+                count += 1
+        return count
+
+    # 获取尝试吃掉尽量多子后的棋局 (只有影子棋局可用）
+    def try_to_gain_all(self):
+        assert not self.player1
+        while True:
+            if not self.try_to_gain_one():
+                break
+
+    # 尝试吃掉一个旗子 吃到返回 True 否则 False
+    def try_to_gain_one(self):
+        for i in range(11):
+            for j in range(7):
+                if self.board[i][j]:
+                    continue
+                self.board[i][j] = '+'
+                if self.get_surrounded_count():
+                    return True
+                self.board[i][j] = ''
         return False
 
     @property
