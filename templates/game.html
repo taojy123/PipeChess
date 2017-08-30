@@ -146,7 +146,7 @@
 
     <div class="col-sm-1 col-xs-3" style="padding-top: 5px; padding-left: 10px; padding-right: 0; white-space: nowrap">
         <div class="row" style="padding-top: 9px; padding-bottom: 9px">
-            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px"></span></a>
+            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px">{{ game.name }}</span></a>
         </div>
         <div class="row" style="padding-top: 9px; padding-bottom: 9px;">
             <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 20px; font-weight: bold">水管棋</span></a>
@@ -334,6 +334,13 @@
         }
     });
 
+    $('#help').click(function () {
+        bootbox.prompt('要进的房间号 [当前{{ game.name }}]', function (name) {
+            if(name){
+                top.location = '/game/' + name + '/'
+            }
+        })
+    });
 
     var board = [
         {% for line in game.board %}
