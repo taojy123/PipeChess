@@ -261,7 +261,7 @@ class Game(models.Model):
 
 
     # 获取当前棋盘上被包围 n 面的旗子的数量
-    def get_surrounded_count(self, n=3):
+    def get_surrounded_count(self, n=4):
         count = 0
         board = self.board
         for i in range(11):
