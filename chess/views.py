@@ -54,7 +54,7 @@ def game(request, name):
     game, created = Game.objects.get_or_create(name=name)
 
     if game.is_ai:
-        ai, created = User.objects.get_or_create(username='AI')
+        ai, created = User.objects.get_or_create(username=settings.AI_NAME)
         if game.player1 != ai and game.player2 != ai:
             if game.name.startswith('ai1'):
                 game.player1 = ai

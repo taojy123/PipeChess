@@ -335,7 +335,7 @@
     });
 
     $('#help').click(function () {
-        bootbox.prompt('要进的房间号 [当前{{ game.name }}]', function (name) {
+        bootbox.prompt('进入房间', function (name) {
             if(name){
                 top.location = '/game/' + name + '/'
             }
