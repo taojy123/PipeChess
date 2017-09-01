@@ -270,24 +270,21 @@ class Game(models.Model):
 
         if normal_pipes:
 
-            # 先手尽量不要下中心的4条线, 后手尽量下中心的4条线
-            normal_pipes_tmp = []
-
             if self.turn == 1:
-                # 先手
+                # 先手尽量下中心的4条线
+                normal_pipes_tmp = []
+                for pipe in CENTER_PIPES:
+                    if pipe in normal_pipes:
+                        normal_pipes_tmp.append(pipe)
+            else:
+                # 后手尽量不要下中心的4条线
                 normal_pipes_tmp = normal_pipes[:]
                 for pipe in CENTER_PIPES:
                     if pipe in normal_pipes_tmp:
                         normal_pipes_tmp.remove(pipe)
-            elif self.turn == 2:
-                # 后手
-                for pipe in CENTER_PIPES:
-                    if pipe in normal_pipes:
-                        normal_pipes_tmp.append(pipe)
 
             if normal_pipes_tmp:
                 normal_pipes = normal_pipes_tmp
-
 
             print '=========== ai draw normal ============'
             return random.choice(normal_pipes)
