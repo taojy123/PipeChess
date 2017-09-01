@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Pipe Chess</title>
+    <title>Pipe Chess | {{ game.name }}</title>
 
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
@@ -125,7 +125,7 @@
 
     <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
         <ul class="list-group" style="margin-bottom: 0">
-            <li class="list-group-item list-group-item-warning">
+            <li class="list-group-item list-group-item-warning" style="min-height: 42px">
                 {% if user == game.player1 %}
                     <span class="glyphicon glyphicon-user"></span>
                 {% endif %}
@@ -133,7 +133,7 @@
                 <span class="glyphicon glyphicon-pencil"></span>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </li>
-            <li class="list-group-item list-group-item-info">
+            <li class="list-group-item list-group-item-info" style="min-height: 42px">
                 {% if user == game.player2 %}
                     <span class="glyphicon glyphicon-user"></span>
                 {% endif %}
@@ -146,7 +146,7 @@
 
     <div class="col-sm-1 col-xs-3" style="padding-top: 5px; padding-left: 10px; padding-right: 0; white-space: nowrap">
         <div class="row" style="padding-top: 9px; padding-bottom: 9px">
-            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px">{{ game.name }}</span></a>
+            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px"></span></a>
         </div>
         <div class="row" style="padding-top: 9px; padding-bottom: 9px;">
             <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 20px; font-weight: bold">水管棋</span></a>
@@ -335,11 +335,15 @@
     });
 
     $('#help').click(function () {
-        bootbox.prompt('进入房间', function (name) {
-            if(name){
-                top.location = '/game/' + name + '/'
+        bootbox.prompt({
+            title: '更换房间',
+            value: '{{ game.name }}',
+            callback: function (name) {
+                if(name){
+                    top.location = '/game/' + name + '/';
+                }
             }
-        })
+        });
     });
 
     var board = [

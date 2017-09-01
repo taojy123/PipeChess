@@ -36,6 +36,8 @@ urlpatterns = [
     url(r'^password/$', password),
 
     url(r'^output/$', output),
+
+    url(r'^.+$', index),
 ]
 
 

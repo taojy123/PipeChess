@@ -39,6 +39,10 @@ INIT_BOARD_DATA = [
 ]
 
 
+# 中心的4条线
+CENTER_PIPES = [(4, 3), (5, 2), (5, 4), (6, 3)]
+
+
 class Game(models.Model):
 
     name = models.CharField(max_length=255)
@@ -221,6 +225,7 @@ class Game(models.Model):
 
         if gain_pipes:
             print '=========== ai draw gain =============='
+
             game = self.get_shadow()
             try_count = game.try_to_gain_all()
             gs, ns, ls = game.get_gain_normal_lost_pipes()
@@ -264,6 +269,26 @@ class Game(models.Model):
             return random.choice(gain_pipes)
 
         if normal_pipes:
+
+            # 先手尽量不要下中心的4条线, 后手尽量下中心的4条线
+            normal_pipes_tmp = []
+
+            if self.turn == 1:
+                # 先手
+                normal_pipes_tmp = normal_pipes[:]
+                for pipe in CENTER_PIPES:
+                    if pipe in normal_pipes_tmp:
+                        normal_pipes_tmp.remove(pipe)
+            elif self.turn == 2:
+                # 后手
+                for pipe in CENTER_PIPES:
+                    if pipe in normal_pipes:
+                        normal_pipes_tmp.append(pipe)
+
+            if normal_pipes_tmp:
+                normal_pipes = normal_pipes_tmp
+
+
             print '=========== ai draw normal ============'
             return random.choice(normal_pipes)
 
