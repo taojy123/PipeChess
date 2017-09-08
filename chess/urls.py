@@ -37,7 +37,6 @@ urlpatterns = [
 
     url(r'^output/$', output),
 
-    url(r'^.+$', index),
 ]
 
 
@@ -53,3 +52,6 @@ urlpatterns += staticfiles_urlpatterns()
 #     '^' + re.escape(settings.STATIC_URL.lstrip('/')) + '(?P<path>.*)$',
 #     serve,
 #     {'document_root': './static/'}))
+
+
+urlpatterns += [ url(r'^.+$', index), ]
