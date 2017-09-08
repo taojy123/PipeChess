@@ -271,6 +271,7 @@ class Game(models.Model):
                             elif d1 < d2:
                                 return i2, j2
                             else:
+                                # todo 闭环龙的让子问题
                                 return ti, tj
 
             return random.choice(gain_pipes)
