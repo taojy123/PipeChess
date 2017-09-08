@@ -252,6 +252,7 @@ class Game(models.Model):
                         for (i, j) in t_pipes[:]:
                             if (i, j) not in gain_pipes:
                                 t_pipes.remove((i, j))
+                                tmp = (i, j)
 
                         if len(t_pipes) == 2:
                             # 如果是左右两边都有可吃的，吃短的那边
@@ -263,8 +264,10 @@ class Game(models.Model):
 
                             if d1 < d2:
                                 return i1, j1
-                            else:
+                            elif d1 > d2:
                                 return i2, j2
+                            else:
+                                return tmp
 
             return random.choice(gain_pipes)
 
