@@ -230,44 +230,47 @@ class Game(models.Model):
             try_count = game.try_to_gain_all()
             gs, ns, ls = game.get_gain_normal_lost_pipes()
             if not gs and not ns and ls:
-                # 面临吃完必须得到送的情况
+                print '面临吃完必须得到送的情况'
                 lost_stat = game.get_lost_stat(ls)
                 if sorted(lost_stat)[0] >= 3:
-                    # 如果剩下还有龙（连着3个以上可吃的）
+                    print '如果剩下还有龙（连着3个以上可吃的）'
                     if try_count == 2:
-                        # 如果这是最后的2个吃，就让给对方，换的下一条龙
+                        print '如果这是最后的2个吃，就让给对方，换的下一条龙'
                         game2 = self.get_shadow()
                         game2.try_to_gain_one()
                         i, j = game2.try_to_gain_one()
                         return i, j
                     elif try_count == 3:
-                        # 如果这是最后的3个吃，注意要留好两个相连的吃的
+                        print '如果这是最后的3个吃，注意要留好两个相连的吃的'
                         game2 = self.get_shadow()
                         t_pipes = []
                         t_pipes.append(game2.try_to_gain_one())
                         t_pipes.append(game2.try_to_gain_one())
                         t_pipes.append(game2.try_to_gain_one())
 
+                        print t_pipes
+
                         i = j = 0
                         for (i, j) in t_pipes[:]:
                             if (i, j) not in gain_pipes:
                                 t_pipes.remove((i, j))
-                                tmp = (i, j)
+
+                        print t_pipes, i, j
 
                         if len(t_pipes) == 2:
-                            # 如果是左右两边都有可吃的，吃短的那边
+                            print '如果是左右两边都有可吃的，吃短的那边'
                             (i1, j1), (i2, j2) = t_pipes
                             d1 = abs(i-i1) + abs(j-j1)
                             d2 = abs(i-i2) + abs(j-j2)
 
-                            assert d1 != d2
+                            print d1, d2
 
                             if d1 < d2:
                                 return i1, j1
                             elif d1 > d2:
                                 return i2, j2
                             else:
-                                return tmp
+                                return i, j
 
             return random.choice(gain_pipes)
 
