@@ -1,4 +1,4 @@
-django
+django<2
 xlwt
 BeautifulSoup
 django-jsonfield
