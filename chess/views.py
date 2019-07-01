@@ -31,7 +31,7 @@ def make_random_name():
 def index(request):
     game_name = request.session.get('game_name')
     if not game_name:
-        game_name = str(random.randint(1000, 9999))
+        game_name = 'ai' + str(random.randint(1000, 9999))
 
     return HttpResponseRedirect('/game/%s/' % game_name)
 
