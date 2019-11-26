@@ -124,15 +124,16 @@ class Game(models.Model):
     def ai_try_to_draw(self):
         if self.winner:
             return
-        ai, created = User.objects.get_or_create(username=settings.AI_NAME)
-        if self.current_player != ai:
+        
+        if not self.is_ai_turn:
             return
 
+        ai = self.current_player
         t1 = time.time()
         i, j = self.get_best_draw()
         t2 = time.time()
         print 'ai_try_to_draw, cost:', t2 - t1
-
+        
         self.draw_pipe(i, j, ai)
 
     # 获取当前棋局的影子棋局 即单纯复制 board
@@ -392,11 +393,16 @@ class Game(models.Model):
 
     @property
     def is_ai(self):
-        return self.name.startswith('ai')
+        return self.name.lower().startswith('ai')
 
     @property
     def current_player(self):
         return getattr(self, 'player%d' % self.turn)
+    
+    @property
+    def is_ai_turn(self):
+        from chess.views import AI_NAME
+        return self.current_player.username == AI_NAME
 
     @property
     def status(self):

@@ -25,6 +25,9 @@ urlpatterns = [
 
     url(r'^$', index),
     url(r'^index/$', index),
+    
+    url(r'^new/$', new),
+    url(r'^match/$', match),
 
     url(r'^game/([\d\w]+)/$', game),
     url(r'^game/([\d\w]+)/status/$', game_status),
@@ -34,8 +37,6 @@ urlpatterns = [
     url(r'^login/$', login),
     url(r'^logout/$', logout),
     url(r'^password/$', password),
-
-    url(r'^output/$', output),
 
 ]
 

@@ -42,7 +42,7 @@ admin.site.unregister(Site)
 
 
 @admin.register(Game)
-class ReminderAdmin(admin.ModelAdmin):
+class GameAdmin(admin.ModelAdmin):
 
     def display(self, obj):
         return obj.board_display_html

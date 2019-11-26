@@ -5,17 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Pipe Chess | {{ game.name }}</title>
+    <title>水管棋 | 对局房间 {{ game.name }}</title>
 
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
 
-
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-    <script src="/static/js/jquery.ui.touch-punch.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootbox.min.js"></script>
+    <style>
+      .main{
+        width: 98%;
+      }
+      @media (min-width: 380px) {
+          .main {
+              width: 380px;
+              left: 50%;
+              margin-left: -190px;
+              position: absolute;
+          }
+      }
+    </style>
 
 </head>
 
@@ -27,10 +34,10 @@
     <span class="glyphicon-thumbs-up"></span>
 </div>
 
-<div class="row" style="width:98%; overflow: hidden; ">
+<div class="main">
 
     {# 3 * 5 #}
-    <div id="board" style="width: 300px; height: 500px; padding: 30px; position: relative; float: left; margin-left: 10%">
+    <div id="board" style="width: 270px; height: 450px; padding: 30px; position: relative; float: left; margin-left: 50px">
 
         <div id="panel" style="position: relative; width: 100%; height: 100%">
 
@@ -118,44 +125,111 @@
                 {% endfor %}
             {% endfor %}
 
-
         </div>
 
     </div>
 
-    <div class="col-sm-5 col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
-        <ul class="list-group" style="margin-bottom: 0">
-            <li class="list-group-item list-group-item-warning" style="min-height: 42px">
-                {% if user == game.player1 %}
-                    <span class="glyphicon glyphicon-user"></span>
-                {% endif %}
-                <span id="player1" class="player">{{ game.player1.username }}</span>
-                <span class="glyphicon glyphicon-pencil"></span>
-                <span class="glyphicon glyphicon-thumbs-up"></span>
-            </li>
-            <li class="list-group-item list-group-item-info" style="min-height: 42px">
-                {% if user == game.player2 %}
-                    <span class="glyphicon glyphicon-user"></span>
-                {% endif %}
-                <span id="player2" class="player">{{ game.player2.username }}</span>
-                <span class="glyphicon glyphicon-pencil"></span>
-                <span class="glyphicon glyphicon-thumbs-up"></span>
-            </li>
-        </ul>
-    </div>
+    <div class="row">
 
-    <div class="col-sm-1 col-xs-3" style="padding-top: 5px; padding-left: 10px; padding-right: 0; white-space: nowrap">
-        <div class="row" style="padding-top: 9px; padding-bottom: 9px">
-            <a href="#" ><span id="help" class="glyphicon glyphicon-question-sign" style="font-size: 20px"></span></a>
+        <div class="col-xs-9" style="padding-top: 5px; padding-left: 10%; padding-right: 3%; ">
+            <ul class="list-group" style="margin-bottom: 0">
+                <li class="list-group-item list-group-item-warning" style="min-height: 42px">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="glyphicon glyphicon-thumbs-up"></span>
+                    <span id="player1" class="player">{{ game.player1.username }}</span>
+                    {% if user == game.player1 %}
+                        <span class="glyphicon glyphicon-user"></span>
+                    {% elif user == game.player2 %}
+                        （对手）
+                    {% endif %}
+                </li>
+                <li class="list-group-item list-group-item-info" style="min-height: 42px">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="glyphicon glyphicon-thumbs-up"></span>
+                    {% if game.player2 %}
+                        <span id="player2" class="player">
+                            {{ game.player2.username }}
+                        </span>
+                        {% if user == game.player2 %}
+                            <span class="glyphicon glyphicon-user"></span>
+                        {% elif user == game.player1 %}
+                            （对手）
+                        {% endif %}
+                    {% else %}
+                        房间[{{ game.name }}] 等待其他玩家进入...
+                        <br>
+                        或分享此房间邀请好友对弈
+                    {% endif %}
+                </li>
+            </ul>
         </div>
-        <div class="row" style="padding-top: 9px; padding-bottom: 9px;">
-            <a href="#" ><span class="glyphicon glyphicon-cog" style="font-size: 20px; font-weight: bold">水管棋</span></a>
+
+        <div class="col-xs-3" style="padding-top: 5px; padding-left: 10px; padding-right: 0; white-space: nowrap">
+            <div class="row" style="padding-top: 9px; padding-bottom: 9px">
+                <a href="#" id="help" data-toggle="modal" data-target="#helpModal">
+                  <span class="glyphicon glyphicon-question-sign" style="font-size: 20px"></span>
+                  <span style="font-weight: bold; margin: 2px; position: absolute">规则说明</span>
+                </a>
+            </div>
+            <div class="row" style="padding-top: 9px; padding-bottom: 9px;">
+                <a href="#" id="options" data-toggle="modal" data-target="#optionsModal">
+                  <span class="glyphicon glyphicon-cog" style="font-size: 20px"></span>
+                  <span style="font-weight: bold; margin: 2px; position: absolute">水管棋</span>
+                </a>
+            </div>
         </div>
+
     </div>
 
 </div>
 
+<!-- optionsModal -->
+<div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="optionsModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="optionsModalLabel">当前房间: {{ game.name }}</h4>
+      </div>
+      <div class="modal-body" style="padding: 0">
+          <div class="list-group" style="margin: 0">
+              <a href="/new/" class="list-group-item list-group-item-info">创建房间</a>
+              <a href="/match/" class="list-group-item list-group-item-warning">匹配对局</a>
+              <a href="#" class="list-group-item list-group-item-success" id="join" data-dismiss="modal">进入指定房间</a>
+              <a href="/new/?ai=1" class="list-group-item list-group-item-danger">AI 对局</a>
+              <a href="/new/?ai=1" class="list-group-item list-group-item"></a>
+              <a href="https://github.com/taojy123/PipeChess" class="list-group-item list-group-item-info">项目地址：http://github.com/taojy123/PipeChess</a>
+              <a href="#" class="list-group-item list-group-item-info">联系邮箱：taojy123@163.com</a>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- helpModal -->
+<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="helpModalLabel">水管棋 玩法规则</h4>
+      </div>
+      <div class="modal-body">
+        <p>本游戏无须注册无须登录，打开网页即可参与。</p>
+        <p>每次打开游戏，系统会为您自动生成一个拥有个性名称的用户，并在浏览器缓存中记录一段时间。</p>
+        <p>新建的房间，您是第一位玩家，请耐心等待其他玩家加入后开始游戏，或分享此房间邀请好友对弈。</p>
+        <p>匹配对局，会寻找和匹配当前只有一位玩家的房间，自动进入开始游戏，若当前无合适的房间，则会新建房间，等待其他玩家进入。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="/static/js/jquery.ui.touch-punch.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/bootbox.min.js"></script>
 
 <script type="text/javascript">
 
@@ -214,7 +288,7 @@
                     $('#' + tid).css('background', 'lightgray');
                 }
                 if (last_pipe[0]===i && last_pipe[1]===j){
-                    $('#' + tid).css('background', '#aaaaaa');
+                    $('#' + tid).css('background', '#999999');
                 }
                 if (item === '1') {
                     x = (j - 1) / 2;
@@ -334,9 +408,9 @@
         }
     });
 
-    $('#help').click(function () {
+    $('#join').click(function () {
         bootbox.prompt({
-            title: '更换房间',
+            title: '输入房间编号',
             value: '{{ game.name }}',
             callback: function (name) {
                 if(name){

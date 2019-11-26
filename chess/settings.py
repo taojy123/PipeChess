@@ -163,11 +163,3 @@ LOGGING = {
 }
 
 
-SERVER_EMAIL = 'watchmen123456@163.com'
-EMAIL_HOST = 'smtp.163.com'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'watchmen123456'
-EMAIL_HOST_PASSWORD = 'wm123456'
-
-AI_NAME = 'CrazyAI'
-

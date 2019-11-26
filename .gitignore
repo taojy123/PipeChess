@@ -38,3 +38,5 @@ nosetests.xml
 
 data.db
 
+.idea/
+*.py___jb_old___
