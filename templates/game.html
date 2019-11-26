@@ -192,7 +192,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="optionsModalLabel">当前房间: {{ game.name }}</h4>
+        <h4 class="modal-title" id="optionsModalLabel">
+          {% if user == game.player1 or user == game.player2 %}
+              当前房间:
+          {% else %}
+              围观对局:
+          {% endif %}
+          {{ game.name }}
+        </h4>
       </div>
       <div class="modal-body" style="padding: 0">
           <div class="list-group" style="margin: 0">
