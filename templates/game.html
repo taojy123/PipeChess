@@ -11,6 +11,9 @@
     <link href="/static/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
 
     <style>
+      .row{
+        margin: 0;
+      }
       .main{
         width: 98%;
       }
@@ -458,6 +461,11 @@
             }
         })
     }, 2000);
+
+    // https://www.cnblogs.com/ecmasea/p/9040814.html
+    document.body.addEventListener('touchmove', function (e) {
+      e.preventDefault(); //阻止默认的处理方式(阻止下拉滑动的效果)
+    }, {passive: false});
 
 </script>
 
