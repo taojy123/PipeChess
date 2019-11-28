@@ -14,7 +14,7 @@
 ![](https://github.com/taojy123/PipeChess/raw/master/static/img/t02.gif)
 
 
-当落笔后正好将 4 条水管正好围起一个方格时，做上标记，吃掉这个格子，吃掉格子后，该玩家可以（且必须）继续落 1 笔
+当落笔后正好将 4 条水管正好围起一个方格时，做上标记，吃掉这个格子；吃掉格子后，该玩家可以（且必须）继续落 1 笔
 
 ![](https://github.com/taojy123/PipeChess/raw/master/static/img/t03.gif)
 
