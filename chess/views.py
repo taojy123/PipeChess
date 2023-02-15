@@ -36,7 +36,7 @@ def new(request):
     ai = request.GET.get('ai', False)
     game_name = None
     for i in range(1000):
-        game_name = str(random.randint(1000, 9999))
+        game_name = str(random.randint(100000, 999999))
         if ai:
             game_name = 'ai' + game_name
         if not Game.objects.filter(name=game_name).exists():
